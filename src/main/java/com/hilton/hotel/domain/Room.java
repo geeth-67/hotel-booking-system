@@ -1,4 +1,4 @@
-package com.hotelbooking.room_service.entity;
+package com.hilton.hotel.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
