@@ -1,4 +1,23 @@
 services:
+  keycloak:
+    build: ./keycloak
+    command: start-dev --import-realm --health-enabled=true
+    ports:
+      - "9001:8080"
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_HTTP_ENABLED: "true"
+      KC_HOSTNAME_STRICT: "false"
+      KC_HEALTH_ENABLED: "true"
+
+    healthcheck:
+      test: [ "CMD", "/bin/bash", "/opt/keycloak/healthcheck.sh" ]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 90s
+
   postgres:
     image: postgres:17-alpine
     container_name: hotel-booking-database-container
