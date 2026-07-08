@@ -1,6 +1,5 @@
 package com.hilton.hotel.domain;
 
-import com.hotelbooking.room_service.entity.Room;
 import jakarta.persistence.*;
 import lombok.*;
 import org.apache.catalina.User;
