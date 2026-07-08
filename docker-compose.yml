@@ -1,6 +1,7 @@
 services:
   keycloak:
     build: ./keycloak
+    container_name: hotel-keycloak
     command: start-dev --import-realm --health-enabled=true
     ports:
       - "9001:8080"
@@ -10,7 +11,6 @@ services:
       KC_HTTP_ENABLED: "true"
       KC_HOSTNAME_STRICT: "false"
       KC_HEALTH_ENABLED: "true"
-
     healthcheck:
       test: [ "CMD", "/bin/bash", "/opt/keycloak/healthcheck.sh" ]
       interval: 10s

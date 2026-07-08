@@ -7,6 +7,12 @@ spring:
     username: admin
     password: admin
 
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:9001/realms/hotel-booking
+
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
