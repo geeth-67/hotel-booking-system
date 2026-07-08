@@ -22,6 +22,10 @@ public class Room {
     @Column(nullable = false, unique = true)
     private String roomNumber;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false , length = 20)
+    private RoomType type;
+
     @Column(nullable = false)
     private BigDecimal pricePerNight;
 
