@@ -2,6 +2,7 @@ package com.hilton.hotel.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -29,14 +30,19 @@ public class Room {
     @Column(nullable = false)
     private BigDecimal pricePerNight;
 
-    @Column(nullable = false)
+    @Builder.Default
     @Enumerated(EnumType.STRING)
-    private RoomStatus status;
+    @Column(nullable = false, length = 20)
+    private RoomStatus status = RoomStatus.AVAILABLE;
+
+    @Column(nullable = false)
+    private Integer capacity;
 
     @Column(length = 1000)
     private String description;
 
-    @Column(nullable = false, updatable = false)
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
     @PrePersist
