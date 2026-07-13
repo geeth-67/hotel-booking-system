@@ -31,6 +31,7 @@ public class RoomService implements RoomServiceInterface {
         }
 
         Room room = Room.builder()
+
                 .roomNumber(request.getRoomNumber())
                 .type(request.getType())
                 .pricePerNight(request.getPricePerNight())
