@@ -22,4 +22,15 @@ public class GlobalExceptionHandler {
                 new ApiErrorResponse(404 , "Not Found", ex.getMessage())
         );
     }
+
+    @ExceptionHandler(DuplicateResourceException.class)
+    public ResponseEntity<ApiErrorResponse> handleDuplicateResourceException(
+            DuplicateResourceException ex, HttpServletRequest req
+    ) {
+        log.info("Duplicate resource {}: {}", req.getRequestURI(), ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                new ApiErrorResponse(409, "Duplicate resource", ex.getMessage())
+        );
+    }
 }
