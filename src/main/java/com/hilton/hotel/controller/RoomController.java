@@ -50,6 +50,16 @@ public class RoomController {
                 .body(roomService.createRoom(request));
     }
 
+    @PutMapping("/{Id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<RoomResponse> updateRoom(
+            @Valid @RequestBody RoomRequest request
+    ) {
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(roomService.createRoom(request));
+    }
+
     @PatchMapping("/{roomId}/status")
     public ResponseEntity<RoomResponse> updateRoomStatus(
             @PathVariable Long roomId,
