@@ -19,6 +19,9 @@ public class Guest {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @Column(name = "keycloak_id", nullable = false, unique = true)
+    private String keycloak;
+
     @Column(nullable = false)
     private String firstName;
 
@@ -42,6 +45,4 @@ public class Guest {
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
     }
-
-
 }
