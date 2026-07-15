@@ -1,12 +1,13 @@
-package com.hilton.hotel.service;
+package com.hilton.hotel.service.impl;
 
 import com.hilton.hotel.domain.Room;
 import com.hilton.hotel.domain.RoomStatus;
-import com.hilton.hotel.dto.RoomRequest;
-import com.hilton.hotel.dto.RoomResponse;
+import com.hilton.hotel.dto.request.RoomRequest;
+import com.hilton.hotel.dto.response.RoomResponse;
 import com.hilton.hotel.exception.DuplicateResourceException;
 import com.hilton.hotel.exception.ResourceNotFoundException;
 import com.hilton.hotel.repository.RoomRepository;
+import com.hilton.hotel.service.RoomServiceInterface;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
