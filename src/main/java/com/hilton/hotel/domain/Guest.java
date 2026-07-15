@@ -20,7 +20,7 @@ public class Guest {
     private Long id;
 
     @Column(name = "keycloak_id", nullable = false, unique = true)
-    private String keycloak;
+    private String keycloakId;
 
     @Column(nullable = false)
     private String firstName;
