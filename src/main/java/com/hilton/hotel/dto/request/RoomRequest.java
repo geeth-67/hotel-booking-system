@@ -1,8 +1,9 @@
-package com.hilton.hotel.dto;
+package com.hilton.hotel.dto.request;
 
 import com.hilton.hotel.domain.Room;
 import com.hilton.hotel.domain.RoomStatus;
 import com.hilton.hotel.domain.RoomType;
+import com.hilton.hotel.dto.response.RoomResponse;
 import lombok.*;
 
 import java.math.BigDecimal;
