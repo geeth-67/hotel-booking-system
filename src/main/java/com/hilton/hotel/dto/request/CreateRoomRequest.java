@@ -1,4 +1,4 @@
-package com.hilton.hotel.dto;
+package com.hilton.hotel.dto.request;
 
 import com.hilton.hotel.domain.RoomType;
 import jakarta.validation.constraints.*;
