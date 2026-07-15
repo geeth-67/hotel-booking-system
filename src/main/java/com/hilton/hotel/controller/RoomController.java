@@ -1,9 +1,9 @@
 package com.hilton.hotel.controller;
 
 import com.hilton.hotel.domain.RoomStatus;
-import com.hilton.hotel.dto.RoomRequest;
-import com.hilton.hotel.dto.RoomResponse;
-import com.hilton.hotel.service.RoomService;
+import com.hilton.hotel.dto.request.RoomRequest;
+import com.hilton.hotel.dto.response.RoomResponse;
+import com.hilton.hotel.service.impl.RoomService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

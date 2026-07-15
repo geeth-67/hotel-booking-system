@@ -21,3 +21,10 @@ spring:
 
 server:
   port: 8089
+
+keycloak:
+  admin:
+    client-id: user-provisioning-client
+    client-secret: OmlvRRMQpn1R0fagVgI3olZHal6DWHC1
+    realm: hotel-booking
+    server-url: http://localhost:9001

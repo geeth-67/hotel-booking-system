@@ -2,8 +2,8 @@ package com.hilton.hotel.service;
 
 import com.hilton.hotel.domain.Room;
 import com.hilton.hotel.domain.RoomStatus;
-import com.hilton.hotel.dto.RoomRequest;
-import com.hilton.hotel.dto.RoomResponse;
+import com.hilton.hotel.dto.request.RoomRequest;
+import com.hilton.hotel.dto.response.RoomResponse;
 import org.springframework.data.domain.Page;
 
 public interface RoomServiceInterface {

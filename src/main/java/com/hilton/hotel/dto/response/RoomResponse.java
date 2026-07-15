@@ -1,4 +1,4 @@
-package com.hilton.hotel.dto;
+package com.hilton.hotel.dto.response;
 
 import com.hilton.hotel.domain.RoomStatus;
 import com.hilton.hotel.domain.RoomType;
