@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface GuestRepository extends JpaRepository<Guest, Long> {
 
-    Optional<Guest> findByKeycloak(String keycloakId);
+    Optional<Guest> findByKeycloakId(String keycloakId);
 
     Optional<Guest> findByEmail(String email);
 
@@ -17,5 +17,5 @@ public interface GuestRepository extends JpaRepository<Guest, Long> {
 
     boolean existsByPhoneNo(String phoneNo);
 
-    boolean existsByKeycloak(String keycloak);
+    boolean existsByKeycloakId(String keycloakId);
 }
