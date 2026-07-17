@@ -15,7 +15,7 @@ spring:
 
   security:
     oauth2:
-      resource:
+      resourceserver:
         jwt:
           issuer-uri: http://localhost:9001/realms/hotel-booking
 
@@ -25,6 +25,6 @@ server:
 keycloak:
   admin:
     client-id: user-provisioning-client
-    client-secret: OmlvRRMQpn1R0fagVgI3olZHal6DWHC1
+    client-secret: bNlSNcZ99m8yc0QYVQNqJpuVoolOs0mx
     realm: hotel-booking
     server-url: http://localhost:9001

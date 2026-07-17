@@ -1,4 +1,4 @@
-FROM quay.io/keycloak/keycloak:25.0.0
+FROM docker.io/keycloak/keycloak:25.0.0
 
 USER root
 

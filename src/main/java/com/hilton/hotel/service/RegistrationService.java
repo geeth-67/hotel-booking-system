@@ -45,7 +45,10 @@ public class RegistrationService {
 
     public Guest register(RegisterRequest request) {
         if (guestRepository.existsByEmail(request.getEmail())) {
-            throw new DuplicateResourceException("Email already exists" + request.getEmail());}
+            throw new DuplicateResourceException("Email already exists: " + request.getEmail());}
+
+        if (guestRepository.existsByPhoneNo(request.getPhoneNo())) {
+            throw new DuplicateResourceException("Phone number already exists: " + request.getPhoneNo());}
 
         String adminToken ;
         String keycloakId;
@@ -70,19 +73,41 @@ public class RegistrationService {
             log.warn("Could not assign role to keycloakid - {}",keycloakId);
         }
 
-        Guest guest = guestRepository.save(Guest.builder()
-                .firstName(request.getFirstName())
-                .lastName(request.getLastName())
-                .email(request.getEmail())
-                .phoneNo(request.getPhoneNo())
-                .keycloakId(keycloakId)
-                .role(UserRole.GUEST)
-                .build());
+        Guest guest;
+        try {
+            guest = guestRepository.save(Guest.builder()
+                    .firstName(request.getFirstName())
+                    .lastName(request.getLastName())
+                    .email(request.getEmail())
+                    .phoneNo(request.getPhoneNo())
+                    .keycloakId(keycloakId)
+                    .role(UserRole.GUEST)
+                    .build());
+        } catch (Exception e) {
+            log.error("Database save failed, rolling back Keycloak user {}", keycloakId, e);
+            deleteKeycloakUser(adminToken, keycloakId);
+            throw new RuntimeException("Registration failed, please try again");
+        }
 
         log.info("New Guest created: {}", request.getLastName());
 
         return guest;
 
+    }
+
+    private void deleteKeycloakUser(String adminToken, String keycloakId) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(adminToken);
+            restTemplate.exchange(
+                    serverUrl + "/admin/realms/" + realm + "/users/" + keycloakId,
+                    HttpMethod.DELETE,
+                    new HttpEntity<>(headers),
+                    Void.class
+            );
+        } catch (Exception e) {
+            log.error("Failed to roll back Keycloak user {}. Manual cleanup required.", keycloakId, e);
+        }
     }
 
     private void assignRealmRoles(String adminToken, String keycloakId, String roleName){
