@@ -3,7 +3,7 @@ package com.hilton.hotel.controller;
 import com.hilton.hotel.domain.Guest;
 import com.hilton.hotel.dto.request.RegisterRequest;
 import com.hilton.hotel.dto.response.GuestResponse;
-import com.hilton.hotel.service.RegistrationService;
+import com.hilton.hotel.service.impl.RegistrationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
