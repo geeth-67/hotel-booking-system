@@ -1,0 +1,449 @@
+{
+  "info": {
+    "name": "Hotel Booking API",
+    "description": "Complete Postman collection for the Hilton Hotel Booking System.\n\nModules:\n- Auth (register)\n- Keycloak (token)\n- Rooms\n- Bookings\n\nCollection variables:\n- baseUrl: http://localhost:8089\n- keycloakUrl: http://localhost:9001\n- realm: hotel-booking\n- guestToken / adminToken\n- roomId / bookingId\n- guestUsername / guestPassword / adminUsername / adminPassword\n- clientId: public or confidential client used for password grant",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8089" },
+    { "key": "keycloakUrl", "value": "http://localhost:9001" },
+    { "key": "realm", "value": "hotel-booking" },
+    { "key": "clientId", "value": "hotel-booking-client" },
+    { "key": "guestUsername", "value": "guest@example.com" },
+    { "key": "guestPassword", "value": "password123" },
+    { "key": "adminUsername", "value": "admin" },
+    { "key": "adminPassword", "value": "admin" },
+    { "key": "guestToken", "value": "" },
+    { "key": "adminToken", "value": "" },
+    { "key": "roomId", "value": "1" },
+    { "key": "bookingId", "value": "1" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register Guest",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"phoneNo\": \"+94771234567\",\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/auth/register",
+            "description": "Public endpoint. Creates Keycloak user + Guest record. Returns GuestResponse (201)."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Keycloak",
+      "item": [
+        {
+          "name": "Get Guest Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const json = pm.response.json();",
+                  "  pm.collectionVariables.set('guestToken', json.access_token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/x-www-form-urlencoded" }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "grant_type", "value": "password" },
+                { "key": "client_id", "value": "{{clientId}}" },
+                { "key": "username", "value": "{{guestUsername}}" },
+                { "key": "password", "value": "{{guestPassword}}" }
+              ]
+            },
+            "url": "{{keycloakUrl}}/realms/{{realm}}/protocol/openid-connect/token",
+            "description": "Password grant. Saves access_token into guestToken."
+          }
+        },
+        {
+          "name": "Get Admin Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const json = pm.response.json();",
+                  "  pm.collectionVariables.set('adminToken', json.access_token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/x-www-form-urlencoded" }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "grant_type", "value": "password" },
+                { "key": "client_id", "value": "{{clientId}}" },
+                { "key": "username", "value": "{{adminUsername}}" },
+                { "key": "password", "value": "{{adminPassword}}" }
+              ]
+            },
+            "url": "{{keycloakUrl}}/realms/{{realm}}/protocol/openid-connect/token",
+            "description": "Password grant. Saves access_token into adminToken."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Rooms",
+      "item": [
+        {
+          "name": "Get All Rooms",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/rooms?page=0&size=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "rooms"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "10" }
+              ]
+            },
+            "description": "Public (permitAll). Returns Page<RoomResponse>."
+          }
+        },
+        {
+          "name": "Get Room By Id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/rooms/{{roomId}}",
+            "description": "Public (permitAll). Returns RoomResponse."
+          }
+        },
+        {
+          "name": "Create Room",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const json = pm.response.json();",
+                  "  if (json.id) pm.collectionVariables.set('roomId', String(json.id));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roomNumber\": \"301\",\n  \"type\": \"DOUBLE\",\n  \"pricePerNight\": 150.00,\n  \"capacity\": 2,\n  \"status\": \"AVAILABLE\",\n  \"description\": \"Ocean view double room\"\n}"
+            },
+            "url": "{{baseUrl}}/api/rooms",
+            "description": "ADMIN only. RoomType: SINGLE | DOUBLE | TWIN | SUITE. RoomStatus: AVAILABLE | OCCUPIED | MAINTENANCE."
+          }
+        },
+        {
+          "name": "Update Room",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roomNumber\": \"301\",\n  \"type\": \"SUITE\",\n  \"pricePerNight\": 220.00,\n  \"capacity\": 3,\n  \"status\": \"AVAILABLE\",\n  \"description\": \"Updated suite description\"\n}"
+            },
+            "url": "{{baseUrl}}/api/rooms/{{roomId}}",
+            "description": "ADMIN only. Path variable name in code is {Id}."
+          }
+        },
+        {
+          "name": "Update Room Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/rooms/{{roomId}}/status?status=AVAILABLE",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "rooms", "{{roomId}}", "status"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "AVAILABLE",
+                  "description": "AVAILABLE | OCCUPIED | MAINTENANCE"
+                }
+              ]
+            },
+            "description": "Authenticated. Updates room status only."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Bookings",
+      "item": [
+        {
+          "name": "Create Booking",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const json = pm.response.json();",
+                  "  if (json.bookingId) pm.collectionVariables.set('bookingId', String(json.bookingId));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{guestToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roomId\": {{roomId}},\n  \"checkInDate\": \"2026-08-10\",\n  \"checkOutDate\": \"2026-08-14\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/bookings",
+            "description": "GUEST only. Guest resolved from JWT. Default status PENDING. Saves bookingId."
+          }
+        },
+        {
+          "name": "Get My Bookings",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{guestToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/v1/bookings/me",
+            "description": "GUEST only."
+          }
+        },
+        {
+          "name": "Get Booking By Id",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{guestToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/v1/bookings/{{bookingId}}",
+            "description": "Owner GUEST or ADMIN. Non-owner guest -> 403."
+          }
+        },
+        {
+          "name": "Get All Bookings",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/bookings?page=0&size=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "bookings"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "10" }
+              ]
+            },
+            "description": "ADMIN only."
+          }
+        },
+        {
+          "name": "Cancel Booking",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{guestToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/v1/bookings/{{bookingId}}/cancel",
+            "description": "Owner GUEST only."
+          }
+        },
+        {
+          "name": "Update Booking Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/bookings/{{bookingId}}/status?status=CONFIRMED",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "bookings", "{{bookingId}}", "status"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "CONFIRMED",
+                  "description": "PENDING | CONFIRMED | CHECKED_IN | CHECKED_OUT | CANCELLED"
+                }
+              ]
+            },
+            "description": "ADMIN only."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Error Cases",
+      "item": [
+        {
+          "name": "Auth - Duplicate Email",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"phoneNo\": \"+94771234567\",\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/auth/register",
+            "description": "Expected 409 Duplicate resource when email/phone already exists."
+          }
+        },
+        {
+          "name": "Rooms - Create Without Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roomNumber\": \"999\",\n  \"type\": \"SINGLE\",\n  \"pricePerNight\": 80.00,\n  \"capacity\": 1,\n  \"status\": \"AVAILABLE\",\n  \"description\": \"Should fail unauthorized\"\n}"
+            },
+            "url": "{{baseUrl}}/api/rooms",
+            "description": "Expected 401."
+          }
+        },
+        {
+          "name": "Rooms - Create Duplicate Number",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roomNumber\": \"301\",\n  \"type\": \"SINGLE\",\n  \"pricePerNight\": 80.00,\n  \"capacity\": 1,\n  \"status\": \"AVAILABLE\",\n  \"description\": \"Duplicate room number\"\n}"
+            },
+            "url": "{{baseUrl}}/api/rooms",
+            "description": "Expected 409 when roomNumber already exists."
+          }
+        },
+        {
+          "name": "Bookings - Past Dates",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{guestToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roomId\": {{roomId}},\n  \"checkInDate\": \"2020-01-01\",\n  \"checkOutDate\": \"2020-01-05\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/bookings",
+            "description": "Expected 400 Invalid booking / bean validation failure."
+          }
+        },
+        {
+          "name": "Bookings - Missing roomId",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{guestToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"checkInDate\": \"2026-08-10\",\n  \"checkOutDate\": \"2026-08-14\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/bookings",
+            "description": "Expected validation failure for roomId."
+          }
+        },
+        {
+          "name": "Bookings - Overlap Conflict",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{guestToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roomId\": {{roomId}},\n  \"checkInDate\": \"2026-08-10\",\n  \"checkOutDate\": \"2026-08-14\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/bookings",
+            "description": "Create the same room/dates twice. Expected 409 Booking conflict."
+          }
+        },
+        {
+          "name": "Bookings - Guest Forbidden Get All",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{guestToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/v1/bookings",
+            "description": "Expected 403."
+          }
+        },
+        {
+          "name": "Bookings - Unauthorized No Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roomId\": {{roomId}},\n  \"checkInDate\": \"2026-08-10\",\n  \"checkOutDate\": \"2026-08-14\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/bookings",
+            "description": "Expected 401."
+          }
+        }
+      ]
+    }
+  ]
+}
