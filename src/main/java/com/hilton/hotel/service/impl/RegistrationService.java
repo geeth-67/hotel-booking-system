@@ -1,4 +1,4 @@
-package com.hilton.hotel.service;
+package com.hilton.hotel.service.impl;
 
 
 import com.hilton.hotel.domain.Guest;
